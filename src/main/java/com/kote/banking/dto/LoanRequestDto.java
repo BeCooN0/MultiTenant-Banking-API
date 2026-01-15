@@ -1,0 +1,19 @@
+package com.kote.banking.dto;
+
+import com.kote.banking.entity.enums.LoanStatus;
+import lombok.Data;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Date;
+
+@Data
+public class LoanRequestDto {
+    private Long accountId;
+
+    private BigDecimal totalAmount;
+    private BigDecimal principalAmount;
+    private BigDecimal paidAmount;
+    private BigDecimal interestRate;
+    private Date nextPaymentDate;
+    private LoanStatus loanStatus;
+}

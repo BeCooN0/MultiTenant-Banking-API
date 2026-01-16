@@ -4,11 +4,13 @@ import com.kote.banking.dto.LoanRequestDto;
 import com.kote.banking.dto.LoanResponseDto;
 import com.kote.banking.entity.Account;
 import com.kote.banking.entity.Loan;
+import com.kote.banking.entity.LoanProduct;
 import com.kote.banking.entity.Transaction;
 import com.kote.banking.entity.enums.LoanStatus;
 import com.kote.banking.entity.enums.TransactionStatus;
 import com.kote.banking.mapper.LoanMapper;
 import com.kote.banking.repository.AccountRepository;
+import com.kote.banking.repository.LoanProductRepository;
 import com.kote.banking.repository.LoanRepository;
 import com.kote.banking.repository.TransactionRepository;
 import org.springframework.data.domain.Page;
@@ -16,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
@@ -28,19 +29,23 @@ public class LoanService {
     private final AccountRepository accountRepository;
     private final LoanMapper loanMapper;
     private final TransactionRepository transactionRepository;
-    public LoanService(LoanRepository loanRepository, AccountRepository accountRepository, LoanMapper loanMapper, TransactionRepository transactionRepository) {
+    private final LoanProductRepository loanProductRepository;
+    public LoanService(LoanRepository loanRepository, AccountRepository accountRepository, LoanMapper loanMapper, TransactionRepository transactionRepository, LoanProductRepository loanProductRepository) {
         this.loanRepository = loanRepository;
         this.accountRepository = accountRepository;
         this.loanMapper = loanMapper;
         this.transactionRepository = transactionRepository;
+        this.loanProductRepository = loanProductRepository;
     }
 
     @Transactional
     public LoanResponseDto applyLoan(LoanRequestDto loanRequestDto) {
-        BigDecimal interestRate = BigDecimal.valueOf(18);
         BigDecimal principalAmount = loanRequestDto.getPrincipalAmount();
 
         Loan loan = new Loan();
+
+        LoanProduct product = loanProductRepository.findById(loanRequestDto.getLoanProductId())
+                .orElseThrow(() -> new RuntimeException("Loan Product not found"));
 
         Account account = accountRepository.findById(loanRequestDto.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -51,10 +56,11 @@ public class LoanService {
         loan.setAccount(account);
         loan.setPaidAmount(BigDecimal.ZERO);
         loan.setNextPaymentDate(loanRequestDto.getNextPaymentDate());
-        loan.setInterestRate(interestRate);
         loan.setTotalAmount(principalAmount);
         loan.setPaidAmount(BigDecimal.ZERO);
         loan.setLoanStatus(LoanStatus.ACTIVE);
+        loan.setInterestRate(product.getInterestRate());
+        loan.setTotalAmount(loanRequestDto.getPrincipalAmount());
         account.setBalance(account.getBalance().add(principalAmount));
         accountRepository.save(account);
         loan.setPrincipalAmount(principalAmount);

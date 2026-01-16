@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -19,7 +20,7 @@ public class Loan {
     private BigDecimal principalAmount;
     private BigDecimal paidAmount;
     private BigDecimal interestRate;
-    private Date nextPaymentDate;
+    private Instant nextPaymentDate;
     @Enumerated(EnumType.STRING)
     private LoanStatus loanStatus;
 }

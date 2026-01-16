@@ -1,4 +1,4 @@
-package com.kote.banking.dto;
+package com.kote.banking.entity;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.Instant;

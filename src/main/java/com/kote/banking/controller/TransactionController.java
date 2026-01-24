@@ -55,7 +55,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<TransactionResponseDto>> getTransactions(@RequestBody TransactionSearchDto dto, @PageableDefault(page = 0, size = 10) Pageable pageable){
+    public ResponseEntity<Page<TransactionResponseDto>> getTransactions(@ModelAttribute TransactionSearchDto dto, @PageableDefault(page = 0, size = 10) Pageable pageable){
         Page<TransactionResponseDto> transactions = transactionService.getTransactions(dto, pageable);
         return ResponseEntity.ok(transactions);
     }

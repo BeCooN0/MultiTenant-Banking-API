@@ -31,15 +31,20 @@ public class FlywayConfig {
 
         List<String> allIds = tenantRepository.findAllIds();
         for (String tenant : allIds) {
-            log.info("Migrating schema: {}", tenant);
-            Flyway.configure()
-                    .dataSource(dataSource)
-                    .locations("/db/path/" + "db/migration")
-                    .schemas(tenant)
-                    .baselineOnMigrate(true)
-                    .load()
-                    .migrate();
+            try {
+                log.info("Migrating schema: {}", tenant);
+                Flyway.configure()
+                        .dataSource(dataSource)
+                        .locations("/db/path/" + "db/migration")
+                        .schemas(tenant)
+                        .baselineOnMigrate(true)
+                        .load()
+                        .migrate();
+            }
+            catch (Exception e){
+                System.err.println(e.getMessage());
+            }
+            log.info("flyway migration finished");
         }
-        log.info("flyway migration finished");
     }
 }
